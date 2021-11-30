@@ -2,6 +2,9 @@
 #include <string.h>
 
 #define MAX_PAGES 100 // settable at 2 or more
+#define M 0.15 // settable between 0 and 1
+
+void scalar_multiplication(int order, float matrix[][order], float scalar);
 
 int main() {
 
@@ -56,12 +59,26 @@ int main() {
 		}
 	}
 
+	// ALGORITHM
+	scalar_multiplication(num_pages, link_matrix, M);
+
 	// DEBUGGING
 
 	// Print link matrix
 	for (int i = 0; i < num_pages; i++) {
 		for (int j = 0; j < num_pages; j++)
-			printf("%.1f\t", link_matrix[i][j]);
+			printf("%.2f\t", link_matrix[i][j]);
 		printf("\n");
 	}
+
+
+}
+
+// MATRIX OPERATIONS
+
+// Multiply matrix by scalar
+void scalar_multiplication(int order, float matrix[][order], float scalar) {
+	for (int i = 0; i < order; i++)
+		for (int j = 0; j < order; j++)
+			matrix[i][j] *= scalar;
 }
