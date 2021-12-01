@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include <stdbool.h>
 
 // CONSTANTS
 #define MAX_PAGES 100 // Integer in [2, +inf)
