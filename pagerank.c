@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 
 // CONSTANTS
 #define MAX_PAGES 100 // Integer in [2, +inf)
@@ -28,7 +27,9 @@ int main() {
 
 	// Initialize link matrix
 	float link_matrix[num_pages][num_pages];
-	memset(link_matrix, 0, sizeof(link_matrix));
+	for (int i = 0; i < num_pages; i++)
+		for (int j = 0; j < num_pages; j++)
+			link_matrix[i][j]=0;
 
 	// Links
 	for (int i = 0; i < num_pages; i++) {
@@ -65,17 +66,17 @@ int main() {
 
 	// ALGORITHM
 
-	// Initialize rank column
-	float rank_column[num_pages];
+	// Initialize score column
+	float score_column[num_pages];
 	for (int i = 0; i < num_pages; i++)
-		rank_column[i] = 1 / (float) num_pages;
+		score_column[i] = 1 / (float) num_pages;
 
 	scalar_multiplication(num_pages, link_matrix, M);
-	column_multiplication(num_pages, link_matrix, rank_column);
+	column_multiplication(num_pages, link_matrix, score_column);
 
 	// DEBUGGING
 
-	// Print matrix
+	// Print link matrix
 	printf("Link matrix:\n");
 	for (int i = 0; i < num_pages; i++) {
 		for (int j = 0; j < num_pages; j++)
@@ -83,10 +84,10 @@ int main() {
 		printf("\n");
 	}
 
-	// Print column
-	printf("Rank column:\n");
+	// Print score column
+	printf("Score column:\n");
 	for (int i = 0; i < num_pages; i++)
-		printf("%.3f\n", rank_column[i]);
+		printf("%.3f\n", score_column[i]);
 }
 
 // MATRIX OPERATIONS
@@ -109,5 +110,8 @@ void column_multiplication(int order, float matrix[][order], float column[]) {
 			sum += matrix[i][j] * column[j];
 		temp[i] = sum;
 	}
-	memcpy(column, temp, sizeof(temp));
+
+	// Copy result in the column
+	for (int i = 0; i < order; i++)
+		column[i] = temp[i];
 }
