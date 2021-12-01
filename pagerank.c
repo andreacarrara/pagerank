@@ -8,6 +8,7 @@
 
 // PROTOTYPES
 void scalar_multiplication(int order, float matrix[][order], float scalar);
+void column_multiplication(int order, float matrix[][order], float column[]);
 
 int main() {
 
@@ -64,23 +65,50 @@ int main() {
 	}
 
 	// ALGORITHM
+
+	// Initialize rank column
+	float rank_column[num_pages];
+	for (int i = 0; i < num_pages; i++)
+		rank_column[i] = 1 / (float) num_pages;
+
 	scalar_multiplication(num_pages, link_matrix, M);
+	column_multiplication(num_pages, link_matrix, rank_column);
 
 	// DEBUGGING
 
-	// Print link matrix
+	// Print matrix
+	printf("Link matrix:\n");
 	for (int i = 0; i < num_pages; i++) {
 		for (int j = 0; j < num_pages; j++)
-			printf("%.2f\t", link_matrix[i][j]);
+			printf("%.3f\t", link_matrix[i][j]);
 		printf("\n");
 	}
+
+	// Print column
+	printf("Rank column:\n");
+	for (int i = 0; i < num_pages; i++)
+		printf("%.3f\n", rank_column[i]);
 }
 
 // MATRIX OPERATIONS
 
 // Multiply matrix by scalar
+// Result stored in the matrix
 void scalar_multiplication(int order, float matrix[][order], float scalar) {
 	for (int i = 0; i < order; i++)
 		for (int j = 0; j < order; j++)
 			matrix[i][j] *= scalar;
+}
+
+// Multiply matrix by column
+// Result stored in the column
+void column_multiplication(int order, float matrix[][order], float column[]) {
+	float temp[order];
+	for (int i = 0; i < order; i++) {
+		float sum = 0;
+		for (int j = 0; j < order; j++)
+			sum += matrix[i][j] * column[j];
+		temp[i] = sum;
+	}
+	memcpy(column, temp, sizeof(temp));
 }
