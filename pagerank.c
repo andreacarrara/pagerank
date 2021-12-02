@@ -1,13 +1,15 @@
 #include <stdio.h>
+#include <math.h>
 
 // CONSTANTS
 #define MAX_PAGES 100 // Integer in [2, +inf)
 #define M 0.15 // Real in (0, 1)
 
 // PROTOTYPES
-void scalar_multiplication(float *matrix, int num_elements, float scalar);
+void scalar_multiplication(float *matrix, int order, float scalar);
 void column_multiplication(int order, float matrix[][order], float column[]);
-void addition(float *matrix1, float *matrix2, int num_elements);
+void addition(float *matrix1, float *matrix2, int order);
+float norm(float *column, int order);
 
 int main() {
 
@@ -76,6 +78,7 @@ int main() {
 	scalar_multiplication(score_column, num_pages, M);
 	column_multiplication(num_pages, link_matrix, score_column);
 	addition(score_column, score_column, num_pages);
+	float score_norm = norm(score_column, num_pages);
 
 	// DEBUGGING
 
@@ -91,14 +94,17 @@ int main() {
 	printf("Score column:\n");
 	for (int i = 0; i < num_pages; i++)
 		printf("%.3f\n", score_column[i]);
+
+	// Print score norm
+	printf("Norm: %f\n", score_norm);
 }
 
 // MATRIX OPERATIONS
 
 // Multiply matrix by scalar
 // Result stored in the matrix
-void scalar_multiplication(float *matrix, int num_elements, float scalar) {
-	for (int i = 0; i < num_elements; i++)
+void scalar_multiplication(float *matrix, int order, float scalar) {
+	for (int i = 0; i < order; i++)
 		*matrix++ *= scalar;
 }
 
@@ -120,7 +126,15 @@ void column_multiplication(int order, float matrix[][order], float column[]) {
 
 // Sum two matrices
 // Result stored in the first matrix
-void addition(float *matrix1, float *matrix2, int num_elements) {
-	for (int i = 0; i < num_elements; i++)
+void addition(float *matrix1, float *matrix2, int order) {
+	for (int i = 0; i < order; i++)
 		*matrix1++ += *matrix2++;
+}
+
+// Return Euclidean norm of column
+float norm(float *column, int order) {
+	float sum = 0;
+	for (int i = 0; i < order; i++)
+		sum += powf(*column++, 2);
+	return sqrt(sum);
 }
