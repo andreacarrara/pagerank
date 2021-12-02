@@ -7,6 +7,7 @@
 // PROTOTYPES
 void scalar_multiplication(float *matrix, int num_elements, float scalar);
 void column_multiplication(int order, float matrix[][order], float column[]);
+void addition(float *matrix1, float *matrix2, int num_elements);
 
 int main() {
 
@@ -74,6 +75,7 @@ int main() {
 	scalar_multiplication(link_matrix[0], num_pages * num_pages, M);
 	scalar_multiplication(score_column, num_pages, M);
 	column_multiplication(num_pages, link_matrix, score_column);
+	addition(score_column, score_column, num_pages);
 
 	// DEBUGGING
 
@@ -114,4 +116,11 @@ void column_multiplication(int order, float matrix[][order], float column[]) {
 	// Copy result in the column
 	for (int i = 0; i < order; i++)
 		column[i] = temp[i];
+}
+
+// Sum two matrices
+// Result stored in the first matrix
+void addition(float *matrix1, float *matrix2, int num_elements) {
+	for (int i = 0; i < num_elements; i++)
+		*matrix1++ += *matrix2++;
 }
