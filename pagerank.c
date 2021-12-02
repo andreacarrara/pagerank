@@ -5,7 +5,7 @@
 #define M 0.15 // Real in (0, 1)
 
 // PROTOTYPES
-void scalar_multiplication(int order, float matrix[][order], float scalar);
+void scalar_multiplication(float *matrix, int num_elements, float scalar);
 void column_multiplication(int order, float matrix[][order], float column[]);
 
 int main() {
@@ -29,7 +29,7 @@ int main() {
 	float link_matrix[num_pages][num_pages];
 	for (int i = 0; i < num_pages; i++)
 		for (int j = 0; j < num_pages; j++)
-			link_matrix[i][j]=0;
+			link_matrix[i][j] = 0;
 
 	// Links
 	for (int i = 0; i < num_pages; i++) {
@@ -71,7 +71,8 @@ int main() {
 	for (int i = 0; i < num_pages; i++)
 		score_column[i] = 1 / (float) num_pages;
 
-	scalar_multiplication(num_pages, link_matrix, M);
+	scalar_multiplication(link_matrix[0], num_pages * num_pages, M);
+	scalar_multiplication(score_column, num_pages, M);
 	column_multiplication(num_pages, link_matrix, score_column);
 
 	// DEBUGGING
@@ -94,10 +95,9 @@ int main() {
 
 // Multiply matrix by scalar
 // Result stored in the matrix
-void scalar_multiplication(int order, float matrix[][order], float scalar) {
-	for (int i = 0; i < order; i++)
-		for (int j = 0; j < order; j++)
-			matrix[i][j] *= scalar;
+void scalar_multiplication(float *matrix, int num_elements, float scalar) {
+	for (int i = 0; i < num_elements; i++)
+		*matrix++ *= scalar;
 }
 
 // Multiply matrix by column
