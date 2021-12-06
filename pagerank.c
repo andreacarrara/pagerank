@@ -5,7 +5,7 @@
 #define MAX_PAGES 100 // Integer between [MIN_PAGES, +inf)
 #define MIN_PAGES 2 // Integer between [2, MAX_PAGES]
 #define WEIGHT 0.15 // Real between (0, 1), best at 0.15
-#define ERROR 0.0000001 // Real, best between [0.0001, 0.0000001]
+#define ERROR 0.0001 // Real between (0, +inf), best at 0.0001
 
 // PROTOTYPES
 int get_num_pages();
@@ -14,7 +14,7 @@ void scalar_multiplication(float *matrix, int num_rows, int num_cols, float scal
 void column_multiplication(float *matrix, int num_rows, int num_cols, float *column);
 void addition(float *matrix1, float *matrix2, int num_rows, int num_cols);
 float norm(float *column, int num_rows);
-void print(float *matrix, int num_rows, int num_cols);
+void print_standings(float score_column[], int num_pages);
 
 int main() {
 	// INPUT
@@ -64,11 +64,9 @@ int main() {
 		// Repeat while score norm is greater than error
 	} while (score_norm > ERROR);
 
-	// DEBUGGING
-
-	// Print score column
-	printf("Score column: \n");
-	print(score_column, num_pages, 1);
+	// OUTPUT
+	printf("Here are the standings:\n");
+	print_standings(score_column, num_pages);
 }
 
 // INPUT
@@ -172,11 +170,19 @@ float norm(float *column, int num_rows) {
 	return sqrt(sum);
 }
 
-// Print matrix
-void print(float *matrix, int num_rows, int num_cols) {
-	for (int i = 0; i < num_rows; i++) {
-		for (int j = 0; j < num_cols; j++)
-			printf("%f\t", *matrix++);
-		printf("\n");
+// OUTPUT
+
+// Print standings
+void print_standings(float score_column[], int num_pages) {
+	for (int i = 0; i < num_pages; i++) {
+		float max_score = 0;
+		int page_num = 0;
+		for (int j = 0; j < num_pages; j++)
+			if (score_column[j] > max_score) {
+				max_score = score_column[j];
+				page_num = j;
+			}
+		score_column[page_num] = 0;
+		printf("%d. Page %d: %f\n", i + 1, page_num + 1, max_score);
 	}
 }
