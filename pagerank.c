@@ -2,9 +2,10 @@
 #include <math.h>
 
 // CONSTANTS
-#define MAX_PAGES 100 // Integer in [MIN_PAGES, +inf)
-#define MIN_PAGES 2 // Integer in [2, MAX_PAGES]
-#define WEIGHT 0.15 // Real in (0, 1)
+#define MAX_PAGES 100 // Integer between [MIN_PAGES, +inf)
+#define MIN_PAGES 2 // Integer between [2, MAX_PAGES]
+#define WEIGHT 0.15 // Real between (0, 1), best at 0.15
+#define ERROR 0.0000001 // Real, best between [0.0001, 0.0000001]
 
 // PROTOTYPES
 int get_num_pages();
@@ -13,7 +14,7 @@ void scalar_multiplication(float *matrix, int num_rows, int num_cols, float scal
 void column_multiplication(float *matrix, int num_rows, int num_cols, float *column);
 void addition(float *matrix1, float *matrix2, int num_rows, int num_cols);
 float norm(float *column, int num_rows);
-void print_matrix(float *matrix, int num_rows, int num_cols);
+void print(float *matrix, int num_rows, int num_cols);
 
 int main() {
 	// INPUT
@@ -25,22 +26,43 @@ int main() {
 
 	// CONVERGE LOOP
 
-	// Initialize score column
-	float score_column[num_pages];
-	for (int i = 0; i < num_pages; i++)
-		score_column[i] = 1 / (float) num_pages;
+	// Initialize mean column and score column
+	float mean_column[num_pages], score_column[num_pages];
+	for (int i = 0; i < num_pages; i++) {
+		float entry = 1 / (float) num_pages;
+		mean_column[i] = score_column[i] = entry;
+	}
+
+	// Weight link matrix and mean column
+	scalar_multiplication(link_matrix[0], num_pages, num_pages, 1 - WEIGHT);
+	scalar_multiplication(mean_column, num_pages, 1, WEIGHT);
+
+	float score_norm;
+	do {
+		// Save score column before operations
+		float old_score[num_pages];
+		for (int i = 0; i < num_pages; i++)
+			old_score[i] = score_column[i];
+
+		// Multiply score column by weighted link matrix
+		column_multiplication(link_matrix[0], num_pages, num_pages, score_column);
+
+		// Add weighted mean column to score column
+		addition(score_column, mean_column, num_pages, 1);
+
+		// Subtract old score column from score column
+		scalar_multiplication(old_score, num_pages, 1, -1);
+		addition(old_score, score_column, num_pages, 1);
+
+		// Calculate norm of the difference
+		score_norm = norm(old_score, num_pages);
+	} while (score_norm > ERROR);
 
 	// DEBUGGING
-	scalar_multiplication(link_matrix[0], num_pages, num_pages, WEIGHT);
-	column_multiplication(link_matrix[0], num_pages, num_pages, score_column);
-	addition(score_column, score_column, num_pages, 1);
-	float score_norm = norm(score_column, num_pages);
 
-	printf("Link matrix:\n");
-	print_matrix(link_matrix[0], num_pages, num_pages);
-	printf("Score column:\n");
-	print_matrix(score_column, num_pages, 1);
-	printf("Score norm: %f\n", score_norm);
+	// Print score column
+	printf("Score column: \n");
+	print(score_column, num_pages, 1);
 }
 
 // INPUT
@@ -145,10 +167,10 @@ float norm(float *column, int num_rows) {
 }
 
 // Print matrix
-void print_matrix(float *matrix, int num_rows, int num_cols) {
+void print(float *matrix, int num_rows, int num_cols) {
 	for (int i = 0; i < num_rows; i++) {
 		for (int j = 0; j < num_cols; j++)
-			printf("%.2f\t", *matrix++);
+			printf("%f\t", *matrix++);
 		printf("\n");
 	}
 }
