@@ -34,6 +34,7 @@ int main() {
 	}
 
 	// Weight link matrix and mean column
+	// Product stored in link matrix and mean column
 	scalar_multiplication(link_matrix[0], num_pages, num_pages, 1 - WEIGHT);
 	scalar_multiplication(mean_column, num_pages, 1, WEIGHT);
 
@@ -45,17 +46,22 @@ int main() {
 			old_score[i] = score_column[i];
 
 		// Multiply score column by weighted link matrix
+		// Product stored in score column
 		column_multiplication(link_matrix[0], num_pages, num_pages, score_column);
 
 		// Add weighted mean column to score column
+		// Sum stored in score column
 		addition(score_column, mean_column, num_pages, 1);
 
 		// Subtract old score column from score column
+		// Difference stored in old score column
 		scalar_multiplication(old_score, num_pages, 1, -1);
 		addition(old_score, score_column, num_pages, 1);
 
 		// Calculate norm of the difference
 		score_norm = norm(old_score, num_pages);
+
+		// Repeat while score norm is greater than error
 	} while (score_norm > ERROR);
 
 	// DEBUGGING
@@ -124,7 +130,7 @@ void init_link_matrix(int num_pages, float link_matrix[][num_pages]) {
 // MATRIX OPERATIONS
 
 // Multiply matrix by scalar
-// Result stored in the matrix
+// Product stored in the matrix
 void scalar_multiplication(float *matrix, int num_rows, int num_cols, float scalar) {
 	int num_entries = num_rows * num_cols;
 	for (int i = 0; i < num_entries; i++)
@@ -132,7 +138,7 @@ void scalar_multiplication(float *matrix, int num_rows, int num_cols, float scal
 }
 
 // Multiply matrix by column
-// Result stored in the column
+// Product stored in the column
 // Column must have num_cols rows
 void column_multiplication(float *matrix, int num_rows, int num_cols, float *column) {
 	float product[num_cols];
@@ -150,7 +156,7 @@ void column_multiplication(float *matrix, int num_rows, int num_cols, float *col
 }
 
 // Sum two matrices
-// Result stored in the first matrix
+// Sum stored in the first matrix
 // Matrices must have the same dimension
 void addition(float *matrix1, float *matrix2, int num_rows, int num_cols) {
 	int num_entries = num_rows * num_cols;
