@@ -24,7 +24,7 @@ int main() {
 	float link_matrix[num_pages][num_pages];
 	init_link_matrix(num_pages, link_matrix);
 
-	// CONVERGE LOOP
+	// CONVERGENCE LOOP
 
 	// Initialize mean column and score column
 	float mean_column[num_pages], score_column[num_pages];
