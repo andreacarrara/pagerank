@@ -2,10 +2,10 @@
 #include <math.h>
 
 // CONSTANTS
-#define MAX_PAGES 100 // Integer between [MIN_PAGES, +inf)
-#define MIN_PAGES 2 // Integer between [2, MAX_PAGES]
-#define WEIGHT 0.15 // Real between (0, 1), best at 0.15
-#define ERROR 0.0001 // Real between (0, +inf), best at 0.0001
+#define MAX_PAGES 100 // Integer in [MIN_PAGES, +inf)
+#define MIN_PAGES 2 // Integer in [2, MAX_PAGES]
+#define WEIGHT 0.15 // Real in (0, 1), best at 0.15
+#define ERROR 0.0001 // Real in (0, +inf), best at 0.0001
 
 // PROTOTYPES
 int get_num_pages();
@@ -18,7 +18,6 @@ void print_standings(float score_column[], int num_pages);
 
 int main() {
 	// INPUT
-	printf("Welcome to PageRank!\n");
 	printf("Let's start by creating a model of the web.\n");
 	int num_pages = get_num_pages();
 	float link_matrix[num_pages][num_pages];
@@ -30,38 +29,35 @@ int main() {
 	float mean_column[num_pages], score_column[num_pages];
 	for (int i = 0; i < num_pages; i++) {
 		float entry = 1 / (float) num_pages;
-		mean_column[i] = score_column[i] = entry;
+		mean_column[i] = entry;
+		score_column[i] = entry;
 	}
 
-	// Weight link matrix and mean column
-	// Product stored in link matrix and mean column
+	// Weigh link matrix and mean column
 	scalar_multiplication(link_matrix[0], num_pages, num_pages, 1 - WEIGHT);
 	scalar_multiplication(mean_column, num_pages, 1, WEIGHT);
 
 	float score_norm;
 	do {
-		// Save score column before operations
-		float old_score[num_pages];
+		// Store score column before operations
+		float score_diff[num_pages];
 		for (int i = 0; i < num_pages; i++)
-			old_score[i] = score_column[i];
+			score_diff[i] = score_column[i];
 
 		// Multiply score column by weighted link matrix
-		// Product stored in score column
 		column_multiplication(link_matrix[0], num_pages, num_pages, score_column);
 
 		// Add weighted mean column to score column
-		// Sum stored in score column
 		addition(score_column, mean_column, num_pages, 1);
 
-		// Subtract old score column from score column
-		// Difference stored in old score column
-		scalar_multiplication(old_score, num_pages, 1, -1);
-		addition(old_score, score_column, num_pages, 1);
+		// Subtract previous score column from score column
+		scalar_multiplication(score_diff, num_pages, 1, -1);
+		addition(score_diff, score_column, num_pages, 1);
 
 		// Calculate norm of the difference
-		score_norm = norm(old_score, num_pages);
+		score_norm = norm(score_diff, num_pages);
 
-		// Repeat while score norm is greater than error
+		// Repeat until score norm is smaller than error
 	} while (score_norm > ERROR);
 
 	// OUTPUT
@@ -97,26 +93,26 @@ void init_link_matrix(int num_pages, float link_matrix[][num_pages]) {
 		// Number of links
 		int num_links;
 		do {
-			printf("How many outlinks does page %d have? ", i + 1);
+			printf("How many links does page %d have? ", i + 1);
 			scanf("%d", &num_links);
 			if (num_links < 1)
-				printf("Page %d has too few outlinks, try 1 or more.\n", i + 1);
+				printf("Page %d has too few links, try 1 or more.\n", i + 1);
 			else if (num_links > num_pages - 1)
-				printf("Page %d has too many outlinks, try %d or less.\n", i + 1, num_pages - 1);
+				printf("Page %d has too many links, try %d or less.\n", i + 1, num_pages - 1);
 		} while (num_links < 1 || num_links > num_pages - 1);
 
 		// Linked pages
 		for (int j = 0; j < num_links; j++) {
 			int page_num;
 			do {
-				printf("%d. What page does page %d link to? ", j + 1, i + 1);
+				printf("%d. What page does page %d link? ", j + 1, i + 1);
 				scanf("%d", &page_num);
 				if (page_num < 1 || page_num > num_pages)
 					printf("Page %d does not exist, try again.\n", page_num);
 				else if (page_num == i + 1)
-					printf("Pages can't link to themselves, try again.\n");
+					printf("A page can't link itself, try again.\n");
 				else if (link_matrix[page_num - 1][i])
-					printf("Page %d already links to page %d, try again.\n", i + 1, page_num);
+					printf("Page %d already links page %d, try again.\n", i + 1, page_num);
 			} while (page_num < 1 || page_num > num_pages || page_num == i + 1 || link_matrix[page_num - 1][i]);
 			
 			// Set entry
@@ -155,7 +151,7 @@ void column_multiplication(float *matrix, int num_rows, int num_cols, float *col
 
 // Sum two matrices
 // Sum stored in the first matrix
-// Matrices must have the same dimension
+// Matrices must have the same dimensions
 void addition(float *matrix1, float *matrix2, int num_rows, int num_cols) {
 	int num_entries = num_rows * num_cols;
 	for (int i = 0; i < num_entries; i++)
@@ -176,7 +172,7 @@ float norm(float *column, int num_rows) {
 void print_standings(float score_column[], int num_pages) {
 	for (int i = 0; i < num_pages; i++) {
 		float max_score = 0;
-		int page_num = 0;
+		int page_num;
 		for (int j = 0; j < num_pages; j++)
 			if (score_column[j] > max_score) {
 				max_score = score_column[j];
